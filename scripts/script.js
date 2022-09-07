@@ -43,6 +43,8 @@ function divide(a, b){
     }
 }
 
+// decide which function to use
+// based on the operator
 function operate(operator, a, b){
     switch(operator){
         case '+':
@@ -58,63 +60,69 @@ function operate(operator, a, b){
     }
 }
 
-// let firstNumber = 0, secondNumber = 0, result = 0, operator = '';
-// get value from button
-// document.querySelectorAll('button').forEach(button => 
-//     button.addEventListener('click', e => {
-//         if(e.target.className === 'digit' && operator === ''){
-//             console.log(`first number, and operator: ${operator}`);
-//             displayValue(e.target);
-//             firstNumber = document.getElementById('screen-container').textContent;
-//             console.log('getting first number');
-//         } else if (e.target.className === 'clear') {
-//             document.getElementById('screen-container').innerText = '0';
-//             firstNumber = 0;
-//             secondNumber = 0;
-//             operator = '';
-//             console.log('clear everything');
-//         } else if(e.target.className === 'digit' && operator !== '') {
-//             displayValue(e.target);
-//             secondNumber = document.getElementById('screen-container').textContent;
-//             console.log('getting second number');
-//         } else if(e.target.id === 'equal'){
-//             result = operate(operator, firstNumber, secondNumber);
-//             console.log(`first ${firstNumber}, scnd ${secondNumber}, oprt ${operator}, result: ${result}`);
-//             document.getElementById('screen-container').innerText = result;
-//             console.log('getting result');
-//         } else {
-//             operator = e.target.innerText;
-//             console.log(`getting operator: ${operator}`);
-//             document.getElementById('screen-container').innerText = '0';
-//         }
+// store the operands and operators in an array
+// then loop through it to get the final result
+function calculator(){
+    let numArray = [], oprtArray = [];
+    let inputValue = '', result = 0, operator = '';
 
-//         console.log(firstNumber);
-//         console.log(secondNumber);
-//     }));
-      
+    document.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', e => {
 
-// getting the number from display isn't a good solution
-// let's try an array
-let numArray = [], oprtArray = [], inputValue = '';
+            // get the number part of the operation
+            if(e.target.className === 'digit'){
+                // new operation that doesn't use
+                // previous result
+                if(operator === '='){
+                    inputValue = '';
+                    operator = '';
+                    document.getElementById('screen-container').innerText = '';
+                }
+                // store the user input for digit
+                // to get the number
+                inputValue += e.target.textContent;
+                // display the input dynamically
+                displayValue(e.target);
 
-document.querySelectorAll('button').forEach(button => 
-    button.addEventListener('click', e => {
+            } // store the first number,get the operator
+              // AND get the second input
+            else if (e.target.className === 'operator') {
+                // store the first number in an array
+                numArray.push(Number(inputValue));
+                // store the first operator in an array
+                operator = e.target.textContent;
+                oprtArray.push(operator);
+                // reset the temp string to get the new number
+                inputValue = '';
+                // keep displaying the rest of operation
+                displayValue(e.target);
 
-        if(e.target.className === 'digit'){
-            inputValue += e.target.textContent;
-        } else if (e.target.className === 'operator') {
-            numArray.push(Number(inputValue));
-            oprtArray.push(e.target.textContent);
-            inputValue = '';
-        }
+            } // calculate and display the result of operation
+            else if(e.target.className === 'equal') {
+                // store the second number
+                numArray.push(Number(inputValue));
+                // get the result and display it
+                result = calculate(numArray, oprtArray);
+                document.getElementById('screen-container').innerText = result;
 
-        displayValue(e.target);
+                // reset the previous arrays
+                // to get new operations
+                numArray = [], oprtArray = [];
+                operator = '=';
+                // new input is the result of previous operation
+                // if the user wishes to continue the current operation
+                inputValue = result;
 
-        console.log(`inputValue is ${inputValue}`);
-        console.log(`numArray is: ${numArray}`);
-        console.log(`oprtArray is: ${oprtArray}`);
+            } // clear everything when pressing "Clear"
+            else if(e.target.className === 'clear'){
+                inputValue = '';
+                numArray = [], oprtArray = [];
+                document.getElementById('screen-container').innerText = 0;
+            }
 
-    }));
+        })
+    });
+}
 
 // display that value
 function displayValue(button){
@@ -128,3 +136,13 @@ function displayValue(button){
         screen.innerText += value;
     }
 }
+
+// calculate the result
+function calculate(numArr, oprArr){
+
+    return numArr.reduce((result, nextNum, index) => 
+        operate(oprArr[index - 1], result, nextNum));
+        
+}
+
+calculator();
