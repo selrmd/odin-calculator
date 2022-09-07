@@ -78,6 +78,11 @@ function calculator(){
                     operator = '';
                     document.getElementById('screen-container').innerText = '';
                 }
+
+                if(e.target.id === 'decimal'){
+                    document.getElementById('decimal').disabled = true;
+                }
+
                 // store the user input for digit
                 // to get the number
                 inputValue += e.target.textContent;
@@ -89,6 +94,8 @@ function calculator(){
             else if (e.target.className === 'operator') {
                 // store the first number in an array
                 numArray.push(Number(inputValue));
+                // re-enable decimal point
+                document.getElementById('decimal').disabled = false;
                 // store the first operator in an array
                 operator = e.target.textContent;
                 oprtArray.push(operator);
@@ -118,6 +125,18 @@ function calculator(){
                 inputValue = '';
                 numArray = [], oprtArray = [];
                 document.getElementById('screen-container').innerText = 0;
+                document.getElementById('decimal').disabled = false;
+            } // remove previous input
+            else if(e.target.className === 'delete'){
+                if(operator !== '='){
+                    inputValue = inputValue.substring(0, inputValue.length - 1);
+
+                    if(inputValue.length !== 0)
+                        document.getElementById('screen-container').innerText = inputValue;
+                    else
+                        // in case the user removed every digit in screen
+                        document.getElementById('screen-container').innerText = '0';
+                }
             }
 
         })
