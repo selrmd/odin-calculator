@@ -56,91 +56,56 @@ function operate(operator, a, b){
         case '/':
             return divide(a,b);
         default:
-            console.log('something went wrong');
+            return 'ERROR';
     }
 }
 
-// store the operands and operators in an array
-// then loop through it to get the final result
 function calculator(){
-    let numArray = [], oprtArray = [];
-    let inputValue = '', result = 0, operator = '';
+    let screen, 
+        firstNumber = null, secondNumber = null, result,
+        firstOperator, secondOperator;
+
+    // \d*      matches first number
+    // [+\-*\/] matches the 4 operators
+    // \d*      matches second number
+    // =        matches literal "="
+    let equalReg = /\d*[+\-*\/]\d*=/;
+    // \d*      matches first number
+    // [+\-*\/] matches the 4 operators
+    // \d*      matches second number
+    // [+\-*\/] matches the 4 operators
+    let oprReg = /\d*[+\-*\/]\d*[+\-*\/]/;
 
     document.querySelectorAll('button').forEach(button => {
         button.addEventListener('click', e => {
 
-            // get the number part of the operation
-            if(e.target.className === 'digit'){
-                // new operation that doesn't use
-                // previous result
-                if(operator === '='){
-                    inputValue = '';
-                    operator = '';
-                    document.getElementById('screen-container').innerText = '';
-                }
+            displayValue(e.target);
 
-                if(e.target.id === 'decimal'){
-                    document.getElementById('decimal').disabled = true;
-                }
+            screen = document.getElementById('screen-container').textContent.replace(/\s/g, '');
 
-                // store the user input for digit
-                // to get the number
-                inputValue += e.target.textContent;
-                // display the input dynamically
-                displayValue(e.target);
+            if(equalReg.test(screen)){
+                firstNumber = parseInt((/^\d*/).exec(screen).toString());
+                firstOperator = (/\D/).exec(screen).toString();
+                secondNumber = parseInt((/\d*.$/).exec(screen).toString());
 
-            } // store the first number,get the operator
-              // AND get the second input
-            else if (e.target.className === 'operator') {
-                // store the first number in an array
-                numArray.push(Number(inputValue));
-                // re-enable decimal point
-                document.getElementById('decimal').disabled = false;
-                // store the first operator in an array
-                operator = e.target.textContent;
-                oprtArray.push(operator);
-                // reset the temp string to get the new number
-                inputValue = '';
-                // keep displaying the rest of operation
-                displayValue(e.target);
+                result = operate(firstOperator, firstNumber, secondNumber);
 
-            } // calculate and display the result of operation
-            else if(e.target.className === 'equal') {
-                // store the second number
-                numArray.push(Number(inputValue));
-                // get the result and display it
-                result = calculate(numArray, oprtArray);
                 document.getElementById('screen-container').innerText = result;
+            }
+            
+            if(oprReg.test(screen)){
+                firstNumber = parseInt((/^\d*/).exec(screen).toString());
+                firstOperator = (/\D/).exec(screen).toString();
+                secondNumber = parseInt((/\d*.$/).exec(screen).toString());
+                secondOperator = (/.$/).exec(screen).toString();
 
-                // reset the previous arrays
-                // to get new operations
-                numArray = [], oprtArray = [];
-                operator = '=';
-                // new input is the result of previous operation
-                // if the user wishes to continue the current operation
-                inputValue = result;
-
-            } // clear everything when pressing "Clear"
-            else if(e.target.className === 'clear'){
-                inputValue = '';
-                numArray = [], oprtArray = [];
-                document.getElementById('screen-container').innerText = 0;
-                document.getElementById('decimal').disabled = false;
-            } // remove previous input
-            else if(e.target.className === 'delete'){
-                if(operator !== '='){
-                    inputValue = inputValue.substring(0, inputValue.length - 1);
-
-                    if(inputValue.length !== 0)
-                        document.getElementById('screen-container').innerText = inputValue;
-                    else
-                        // in case the user removed every digit in screen
-                        document.getElementById('screen-container').innerText = '0';
-                }
+                result = operate(firstOperator, firstNumber, secondNumber);
+                document.getElementById('screen-container').innerText = result + '\xa0' + secondOperator + '\xa0';
             }
 
-        })
+        });
     });
+
 }
 
 // display that value
@@ -148,11 +113,16 @@ function displayValue(button){
     let value = button.textContent;
     let screen = document.getElementById('screen-container');
 
+    // prevent user from adding trailing zeros
     if(screen.textContent === '0'){
         screen.innerText = '';
         screen.innerText = value;
-    } else {
+    // don't add space to numbers
+    } else if((/\d/).test(value)){
         screen.innerText += value;
+    // add spaces when user clicks an operator
+    } else {
+        screen.innerText += '\xa0' + value + '\xa0';
     }
 }
 
