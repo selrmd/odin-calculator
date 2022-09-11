@@ -60,7 +60,15 @@ function operate(operator, a, b){
     }
 }
 
+
 function calculator(){
+    // get and display user input
+    setOperands();
+
+    
+}
+
+function setOperands(){
     let operation = {
         inputValue: '',
         firstNumber: null,
@@ -70,17 +78,52 @@ function calculator(){
         result: null,
     };
 
-    document.getElementById('buttons-container').addEventListener('click', e => {
-        operation.inputValue += e.target.textContent;
+    // listen to each button on calculator
+    document.querySelectorAll('button').forEach(button =>{
+        button.addEventListener('click', e => {
 
-        displayOperation(operation.inputValue, operation);
+            // when the input is a digit
+            if(e.target.className === 'digit'){
+                // verify if the current input hasn't an equal sign
+                // if not, continue getting the user's input
+                console.log(`current input: ${operation.inputValue}`);
 
-        console.log(`operation: 1st: ${operation.firstNumber}||${operation.firstOperation}, 2nd:${operation.secondNumber}||${operation.secondOperation}`);
+                if(operation.inputValue.endsWith('=')){
+                    // user has pressed a number after pressing '='
+                    // start a new operation
+                    operation.inputValue = '';
+                    operation.inputValue += e.target.textContent;
+                } else {
+                    operation.inputValue += e.target.textContent;
+                }
 
+            // when the input as an operator
+            } else if(e.target.className === 'operator'){
+                operation.inputValue += e.target.textContent;
+    
+                // only register the final operator clicked by the user
+                // remove any redundant operator
+                if(/\d+\.?\d*[\+\-\*\/\=]{2,}/g.test(operation.inputValue)){
+                    operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=]/g, '') + e.target.textContent;
+                }
+
+            // when the user click the '=' sign
+            } else if(e.target.id === 'equal'){
+
+                operation.inputValue += e.target.textContent;
+
+                // replace any previous operator by '=' sign
+                operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=]+$/, '=');
+                console.log(`equal: ${operation.inputValue}`)
+            }
+            
+            displayOperation(operation.inputValue, operation);
+        });
     });
 }
 
 function displayOperation(inputValue, operation){
+
     // match first number pattern
     // only digits
     if(/^\d+\.?\d*$/.test(inputValue)){
@@ -91,8 +134,9 @@ function displayOperation(inputValue, operation){
         // display first number
         document.getElementById('result').innerText = operation.firstNumber;
 
-    } // match first operation pattern
-      // digits followed by a symbol
+    }
+    // match first operation pattern
+    // digits followed by a symbol
     else if(/^\d+\.?\d*[\+\-\*\/]$/.test(inputValue)){
 
         // store first operator
@@ -100,14 +144,14 @@ function displayOperation(inputValue, operation){
 
         // display the operation in the upper portion of display
         document.getElementById('operation').innerText = `${operation.firstNumber} ${operation.firstOperation}`;
-
-    } // match second number pattern
-      // a symbol followed by a number only (no symbols)
+    }
+    // match second number pattern
+    // a symbol followed by a number only (no symbols)
     else if(/[\+\-\*\/]*[^\+\-\*\/=]$/.test(inputValue)){
 
         // remove the first number and first
         // operation from received input
-        inputValue = inputValue.replace(/^\d+\.?\d*[\+\-\*\/]/, '');
+        inputValue = inputValue.replace(/^\d+\.?\d*[\+\-\*\/]+/, '');
 
         // parseFloat removes any leading zeros
         operation.secondNumber = parseFloat(inputValue);
@@ -115,7 +159,8 @@ function displayOperation(inputValue, operation){
         // display the second number at the bottom portion of display
         document.getElementById('result').innerText = operation.secondNumber;
 
-    } // match the full pattern of operation
+    } 
+    // match the exact full pattern of an operation, ex: 50-20= or 12-2*
     else if(inputValue.match(/^\d+\.?\d*[\+\-\*\/]{1}\d+\.?\d*[\+\-\*\/\=]{1}$/)){
 
         // get the final operation, either '=' or the other 4 operations
@@ -123,12 +168,7 @@ function displayOperation(inputValue, operation){
 
         // calculate and display the result
         displayResult(operation);
-
-    } else {
-        //clearDisplay();
     }
-
-    console.log(`here's what's going on: ${inputValue}`);
 }
 
 // display the result
@@ -151,11 +191,15 @@ function displayResult(operation){
         
         // update inputValue pattern to jump directly to 
         // the 2nd else-if in displayOperation() to get 2nd operator
-        operation.inputValue = operation.result;
+        // add '=' to reinitialize inputValue in 1st if of setOperands()
+        operation.inputValue = operation.result + '=';
         
     } else {
         // display the result of the operation plus the second operator
         document.getElementById('operation').innerText = `${operation.result} ${operation.secondOperation}`;
+
+        // display the result in bottom display, ex: 37
+        document.getElementById('result').innerText = operation.result;
 
         // swap firstOperation with the second
         operation.firstOperation = operation.secondOperation;
