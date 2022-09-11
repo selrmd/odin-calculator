@@ -61,77 +61,121 @@ function operate(operator, a, b){
 }
 
 function calculator(){
-    let screen, 
-        firstNumber = null, secondNumber = null, result,
-        firstOperator, secondOperator;
+    let operation = {
+        inputValue: '',
+        firstNumber: null,
+        secondNumber: null,
+        firstOperation: null,
+        secondOperation: null,
+        result: null,
+    };
 
-    // \d*      matches first number
-    // [+\-*\/] matches the 4 operators
-    // \d*      matches second number
-    // =        matches literal "="
-    let equalReg = /\d*[+\-*\/]\d*=/;
-    // \d*      matches first number
-    // [+\-*\/] matches the 4 operators
-    // \d*      matches second number
-    // [+\-*\/] matches the 4 operators
-    let oprReg = /\d*[+\-*\/]\d*[+\-*\/]/;
+    document.getElementById('buttons-container').addEventListener('click', e => {
+        operation.inputValue += e.target.textContent;
 
-    document.querySelectorAll('button').forEach(button => {
-        button.addEventListener('click', e => {
+        displayOperation(operation.inputValue, operation);
 
-            displayValue(e.target);
+        console.log(`operation: 1st: ${operation.firstNumber}||${operation.firstOperation}, 2nd:${operation.secondNumber}||${operation.secondOperation}`);
 
-            screen = document.getElementById('screen-container').textContent.replace(/\s/g, '');
-
-            if(equalReg.test(screen)){
-                firstNumber = parseInt((/^\d*/).exec(screen).toString());
-                firstOperator = (/\D/).exec(screen).toString();
-                secondNumber = parseInt((/\d*.$/).exec(screen).toString());
-
-                result = operate(firstOperator, firstNumber, secondNumber);
-
-                document.getElementById('screen-container').innerText = result;
-            }
-            
-            if(oprReg.test(screen)){
-                firstNumber = parseInt((/^\d*/).exec(screen).toString());
-                firstOperator = (/\D/).exec(screen).toString();
-                secondNumber = parseInt((/\d*.$/).exec(screen).toString());
-                secondOperator = (/.$/).exec(screen).toString();
-
-                result = operate(firstOperator, firstNumber, secondNumber);
-                document.getElementById('screen-container').innerText = result + '\xa0' + secondOperator + '\xa0';
-            }
-
-        });
     });
-
 }
 
-// display that value
-function displayValue(button){
-    let value = button.textContent;
-    let screen = document.getElementById('screen-container');
+function displayOperation(inputValue, operation){
+    // match first number pattern
+    // only digits
+    if(/^\d+\.?\d*$/.test(inputValue)){
 
-    // prevent user from adding trailing zeros
-    if(screen.textContent === '0'){
-        screen.innerText = '';
-        screen.innerText = value;
-    // don't add space to numbers
-    } else if((/\d/).test(value)){
-        screen.innerText += value;
-    // add spaces when user clicks an operator
+        // parseFloat will remove any leading zeros
+        operation.firstNumber = parseFloat(inputValue);
+
+        // display first number
+        document.getElementById('result').innerText = operation.firstNumber;
+
+    } // match first operation pattern
+      // digits followed by a symbol
+    else if(/^\d+\.?\d*[\+\-\*\/]$/.test(inputValue)){
+
+        // store first operator
+        operation.firstOperation = inputValue.charAt(inputValue.length - 1);
+
+        // display the operation in the upper portion of display
+        document.getElementById('operation').innerText = `${operation.firstNumber} ${operation.firstOperation}`;
+
+    } // match second number pattern
+      // a symbol followed by a number only (no symbols)
+    else if(/[\+\-\*\/]*[^\+\-\*\/=]$/.test(inputValue)){
+
+        // remove the first number and first
+        // operation from received input
+        inputValue = inputValue.replace(/^\d+\.?\d*[\+\-\*\/]/, '');
+
+        // parseFloat removes any leading zeros
+        operation.secondNumber = parseFloat(inputValue);
+
+        // display the second number at the bottom portion of display
+        document.getElementById('result').innerText = operation.secondNumber;
+
+    } // match the full pattern of operation
+    else if(inputValue.match(/^\d+\.?\d*[\+\-\*\/]{1}\d+\.?\d*[\+\-\*\/\=]{1}$/)){
+
+        // get the final operation, either '=' or the other 4 operations
+        operation.secondOperation = inputValue.charAt(inputValue.length - 1);
+
+        // calculate and display the result
+        displayResult(operation);
+
     } else {
-        screen.innerText += '\xa0' + value + '\xa0';
+        //clearDisplay();
+    }
+
+    console.log(`here's what's going on: ${inputValue}`);
+}
+
+// display the result
+// this has two possibilities
+// either user clicked '=' or other 4 operators
+function displayResult(operation){
+
+    // calculate the result
+    operation.result = operate(operation.firstOperation, operation.firstNumber, operation.secondNumber);
+
+    if(operation.secondOperation === '='){
+        // display full pattern in upper display, ex: 12+25=
+        document.getElementById('operation').innerText = `${operation.firstNumber} ${operation.firstOperation} ${operation.secondNumber} ${operation.secondOperation}`;
+        
+        // display the result in bottom display, ex: 37
+        document.getElementById('result').innerText = operation.result;
+        
+        // use previous result as first operand
+        operation.firstNumber = operation.result;
+        
+        // update inputValue pattern to jump directly to 
+        // the 2nd else-if in displayOperation() to get 2nd operator
+        operation.inputValue = operation.result;
+        
+    } else {
+        // display the result of the operation plus the second operator
+        document.getElementById('operation').innerText = `${operation.result} ${operation.secondOperation}`;
+
+        // swap firstOperation with the second
+        operation.firstOperation = operation.secondOperation;
+
+        // use previous result as first operand
+        operation.firstNumber = operation.result;
+
+        // update inputValue pattern to jump directly to 2nd else-if
+        // in displayOperation() to get 2nd number
+        operation.inputValue = operation.firstNumber + operation.secondOperation;
     }
 }
 
-// calculate the result
-function calculate(numArr, oprArr){
+function clearDisplay(){
+    document.getElementById('operation').innerText = '';
+    document.getElementById('result').innerText = '0';
 
-    return numArr.reduce((result, nextNum, index) => 
-        operate(oprArr[index - 1], result, nextNum));
-        
+    for(key in operation){
+        key = null;
+    }
 }
 
 calculator();
