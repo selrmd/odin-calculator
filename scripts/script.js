@@ -65,51 +65,76 @@ function operate(operator, a, b){
 // like clicking an operator multiple times
 function getUserInput(e, operation){
 
-    console.log(`keypressed! event:${e}`);
-
     // INPUT WITH DIGITS
-    if(e.target.className === 'digit' && e.target.id !== 'decimal'){
+    if((e.target.className === 'digit' || e.code === `Numpad${e.key}`) && e.target.id !== 'decimal'){
         // verify if the current input hasn't an equal sign
         if(operation.inputValue.endsWith('=')){
             // user has pressed a number after pressing '='
             // start a new operation
             operation.inputValue = '';
-            operation.inputValue += e.target.textContent;
+
+            if(e.type === 'keydown'){
+                // keyboard support
+                operation.inputValue += e.key;
+            } else {
+                operation.inputValue += e.target.textContent;
+            }
         }
         // if not, continue getting the user's input
         else {
-            operation.inputValue += e.target.textContent;
+            if(e.type === 'keydown'){
+                // keyboard support
+                operation.inputValue += e.key;
+            } else {
+                operation.inputValue += e.target.textContent;
+            }
         }
 
     // INPUT WITH 4 OPERATORS
-    } else if(e.target.className === 'operator'){
+    } else if(e.target.className === 'operator' || 
+             (e.code === 'NumpadAdd' || e.code === 'NumpadSubtract' || e.code === 'NumpadMultiply' || e.code === 'NumpadDivide')){
+
         // get unsanitized input first
-        operation.inputValue += e.target.textContent;
+        if(e.type === 'keydown'){
+            // keyboard support
+            operation.inputValue += e.key;
+        } else {
+            operation.inputValue += e.target.textContent;
+        }
 
         // only register the final operator clicked by the user
         // remove any redundant operator
         if(/\-?\d+\.?\d*[\+\-\*\/\=]{2,}/g.test(operation.inputValue)){
-            operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=]+$/g, '') + e.target.textContent;
+            if(e.type === 'keydown'){
+                operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=]+$/g, '') + e.key;
+            } else {
+                operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=]+$/g, '') + e.target.textContent;
+            }
         }
 
     // GET RESULT WITH EQUAL '=' SIGN
-    } else if(e.target.id === 'equal'){
+    } else if(e.target.id === 'equal' || e.code === 'Enter'){
         // get unsanitized input first
-        operation.inputValue += e.target.textContent;
+        if(e.type === 'keydown'){
+            // keyboard support
+            operation.inputValue += '=';
+        } else {
+            operation.inputValue += e.target.textContent;
+        }
 
         // replace any previous operator by '=' sign
-        operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=\.]+$/, '=');
-
-        // populate the 'operation' display with the current result
-        // if user click '=' again, or firstNumber if no previous result exist
-        document.getElementById('operation').innerText = operation.result || operation.firstNumber || '0';
-        document.getElementById('result').innerText = operation.result || operation.firstNumber || '0';
+        operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=\.]{1,}$/, '=');
     }
 
     // INPUT A DECIMAL NUMBER
-    else if(e.target.id === 'decimal'){
+    else if(e.target.id === 'decimal' || e.key === '.'){
         // get unsanitized input first
-        operation.inputValue += e.target.textContent;
+        if(e.type === 'keydown'){
+            // keyboard support
+            operation.inputValue += e.key;
+        } else {
+            operation.inputValue += e.target.textContent;
+        }
 
         // replace first redundant decimal point
         operation.inputValue = operation.inputValue.replace(/\.{2,}/, '.');
@@ -125,7 +150,7 @@ function getUserInput(e, operation){
         }
         
     // NEGATE A NUMBER WITH '+/-'
-    } else if(e.target.id === 'negative'){
+    } else if(e.target.id === 'negative' || e.code === 'Insert'){
         // first operand can be negated without a problem
         // but second operand need to be extracted and negated
         // to do that, use a temporary string to extract it
@@ -158,7 +183,7 @@ function getUserInput(e, operation){
         operation.inputValue = operation.inputValue.replace(/\-?\d+\.?\d*\=?$/, tempInput);
     
     // DELETE A DIGIT WITH BACKSPACE
-    } else if(e.target.id === 'delete'){
+    } else if(e.target.id === 'delete' || e.code === 'Backspace'){
         // (length - 1) to not include 0 or user need to click twice to delete last digit
         if(operation.inputValue.length - 1){
             operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
@@ -167,7 +192,7 @@ function getUserInput(e, operation){
         }
 
     // RESET CALCULATOR
-    } else if(e.target.id === 'clear'){
+    } else if(e.target.id === 'clear' || e.code === 'Delete'){
         clearDisplay(operation);
     }
 
@@ -177,7 +202,7 @@ function getUserInput(e, operation){
 }
 
 // Use regular expressions to get the operands and operators 
-function displayOperation(inputValue, operation, e){
+function displayOperation(inputValue, operation){
 
     // match first number pattern
     // only digits
@@ -313,13 +338,12 @@ function calculator(){
 
     // mouse events
     document.querySelectorAll('button').forEach(button =>{
-        button.addEventListener('click', (e) => { getUserInput(e, operation)});
+        button.addEventListener('click', (e) => getUserInput(e, operation));
     });
 
     // keyboard events
-    document.querySelectorAll('button').forEach(button =>{
-        button.addEventListener('keypress', (e) => { getUserInput(e, operation)});
-    });
+    window.addEventListener('keydown', (e) => getUserInput(e, operation));
 }
 
+// launch calculator
 calculator();
