@@ -77,7 +77,7 @@ function calculator(){
     document.querySelectorAll('button').forEach(button =>{
         button.addEventListener('click', e => {
 
-            // when the input is a digit
+            // INPUT WITH DIGITS
             if(e.target.className === 'digit' && e.target.id !== 'decimal'){
                 // verify if the current input hasn't an equal sign
                 if(operation.inputValue.endsWith('=')){
@@ -85,32 +85,38 @@ function calculator(){
                     // start a new operation
                     operation.inputValue = '';
                     operation.inputValue += e.target.textContent;
-                } 
+                }
                 // if not, continue getting the user's input
                 else {
                     operation.inputValue += e.target.textContent;
                 }
 
-            // when the input as an operator
+            // INPUT WITH 4 OPERATORS
             } else if(e.target.className === 'operator'){
                 // get unsanitized input first
                 operation.inputValue += e.target.textContent;
-    
+
                 // only register the final operator clicked by the user
                 // remove any redundant operator
-                if(/\d+\.?\d*[\+\-\*\/\=]{2,}/g.test(operation.inputValue)){
-                    operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=]/g, '') + e.target.textContent;
+                if(/\-?\d+\.?\d*[\+\-\*\/\=]{2,}/g.test(operation.inputValue)){
+                    operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=]+$/g, '') + e.target.textContent;
                 }
 
-            // when the user click the '=' sign
+            // GET RESULT WITH EQUAL '=' SIGN
             } else if(e.target.id === 'equal'){
                 // get unsanitized input first
                 operation.inputValue += e.target.textContent;
 
                 // replace any previous operator by '=' sign
                 operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=\.]+$/, '=');
+
+                // populate the 'operation' display with the current result
+                // if user click '=' again, or firstNumber if no previous result exist
+                document.getElementById('operation').innerText = operation.result || operation.firstNumber || '0';
+                document.getElementById('result').innerText = operation.result || operation.firstNumber || '0';
             }
-            // when the user click a decimal point
+
+            // INPUT A DECIMAL NUMBER
             else if(e.target.id === 'decimal'){
                 // get unsanitized input first
                 operation.inputValue += e.target.textContent;
@@ -128,8 +134,41 @@ function calculator(){
                     operation.inputValue = operation.inputValue.replace(/[.]+$/, '');
                 }
                 
-            // if user delete some digits
-            } else if(e.target.className === 'delete'){
+            // NEGATE A NUMBER WITH '+/-'
+            } else if(e.target.id === 'negative'){
+                // first operand can be negated without a problem
+                // but second operand need to be extracted and negated
+                // to do that, use a temporary string to extract it
+
+                // extract second operand without operators
+                let tempInput = operation.inputValue.replace(/^\-?\d+\.?\d*[\+\-\*\/]/, '');
+
+                // check if number is already negative
+                // if it is, remove first character '-'
+                if(tempInput.startsWith('-')){
+                    tempInput = tempInput.substring(1, operation.inputValue.length);
+
+                // if not, add negative sign
+                } else {
+                    tempInput = '-' + tempInput;
+                }
+
+                // if user click more than once at '+/-' button
+                // delete extra '-'
+                tempInput = tempInput.replace(/^\-{2,}/, '-');
+
+                // remove last '=' or result won't negate
+                // ex: in case we have an input like this: 36=
+                // instead of the regular 12*36=
+                if(tempInput.endsWith('=')){
+                    tempInput = tempInput.replace(/\=/, '');
+                }
+
+                // get the previous input with new negated value
+                operation.inputValue = operation.inputValue.replace(/\-?\d+\.?\d*\=?$/, tempInput);
+            
+            // DELETE A DIGIT WITH BACKSPACE
+            } else if(e.target.id === 'delete'){
                 // (length - 1) to not include 0 or user need to click twice to delete last digit
                 if(operation.inputValue.length - 1){
                     operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
@@ -137,14 +176,14 @@ function calculator(){
                     operation.inputValue = '0';
                 }
 
-            // if user wants to reset the whole calculator
-            } else if(e.target.className === 'clear'){
+            // RESET CALCULATOR
+            } else if(e.target.id === 'clear'){
                 clearDisplay(operation);
             }
-            
+
             // using inputValue property directly won't work
             // had to pass it as a string argument instead
-            displayOperation(operation.inputValue, operation, e);
+            displayOperation(operation.inputValue, operation);
         });
     });
 }
@@ -154,18 +193,24 @@ function displayOperation(inputValue, operation, e){
 
     // match first number pattern
     // only digits
-    if(/^\d+\.?\d*$/.test(inputValue)){
+    if(/^\-?\d+\.?\d*$/.test(inputValue)){
 
         // parseFloat will remove any leading zeros
         operation.firstNumber = parseFloat(inputValue);
 
-        // display first number
-        document.getElementById('result').innerText = operation.firstNumber;
+        // display the decimal point parseFloat() removes when it's a whole number
+        if(inputValue.endsWith('.')){
+            // didn't user operation.firstNumber to keep it a float instead of string
+            document.getElementById('result').innerText = parseFloat(inputValue) + '.';
+        } else {
+            // display whole number
+            document.getElementById('result').innerText = operation.firstNumber;
+        }
 
     }
     // match first operation pattern
     // digits followed by a symbol
-    else if(/^\d+\.?\d*[\+\-\*\/]$/.test(inputValue)){
+    else if(/^\-?\d+\.?\d*[\+\-\*\/]$/.test(inputValue)){
 
         // store first operator
         operation.firstOperation = inputValue.charAt(inputValue.length - 1);
@@ -179,17 +224,28 @@ function displayOperation(inputValue, operation, e){
 
         // remove the first number and first
         // operation from received input
-        inputValue = inputValue.replace(/^\d+\.?\d*[\+\-\*\/]+/, '');
-
+        if((/^\-?\d+\.?\d*[\+\-\*\/][\-]/).test(inputValue)){
+            inputValue = inputValue.replace(/^\-?\d+\.?\d*[\+\-\*\/]+/, '');
+            inputValue = '-' + inputValue;
+        } else {
+            inputValue = inputValue.replace(/^\-?\d+\.?\d*[\+\-\*\/]+/, '');
+        }
+        
         // parseFloat removes any leading zeros
         operation.secondNumber = parseFloat(inputValue);
 
-        // display the second number at the bottom portion of display
-        document.getElementById('result').innerText = operation.secondNumber;
+        // display the decimal point parseFloat() removes when it's a whole number
+        if(inputValue.endsWith('.')){
+            // didn't user operation.secondNumber to keep it a float instead of string
+            document.getElementById('result').innerText = parseFloat(inputValue) + '.';
+        } else {
+            // display the second number at the bottom portion of display
+            document.getElementById('result').innerText = operation.secondNumber;
+        }
 
     }
     // match the exact full pattern of an operation, ex: 50-20= or 12-2*
-    else if(inputValue.match(/^\d+\.?\d*[\+\-\*\/]{1}\d+\.?\d*[\+\-\*\/\=]{1}$/)){
+    else if(inputValue.match(/^\-?\d+\.?\d*[\+\-\*\/]{1}\-?\d+\.?\d*[\+\-\*\/\=]{1}$/)){
 
         // get the final operation, either '=' or the other 4 operations
         operation.secondOperation = inputValue.charAt(inputValue.length - 1);
@@ -198,7 +254,6 @@ function displayOperation(inputValue, operation, e){
         displayResult(operation);
     }
 
-    console.log(`current input: ${inputValue}`);
 }
 
 // handle the calculation and display the result
