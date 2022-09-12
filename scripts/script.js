@@ -63,129 +63,117 @@ function operate(operator, a, b){
 // Handle every exception the user can do
 // outside of using the calculator normally
 // like clicking an operator multiple times
-function calculator(){
-    let operation = {
-        inputValue: '',
-        firstNumber: null,
-        secondNumber: null,
-        firstOperation: null,
-        secondOperation: null,
-        result: null,
-    };
+function getUserInput(e, operation){
 
-    // listen to each button on calculator
-    document.querySelectorAll('button').forEach(button =>{
-        button.addEventListener('click', e => {
+    console.log(`keypressed! event:${e}`);
 
-            // INPUT WITH DIGITS
-            if(e.target.className === 'digit' && e.target.id !== 'decimal'){
-                // verify if the current input hasn't an equal sign
-                if(operation.inputValue.endsWith('=')){
-                    // user has pressed a number after pressing '='
-                    // start a new operation
-                    operation.inputValue = '';
-                    operation.inputValue += e.target.textContent;
-                }
-                // if not, continue getting the user's input
-                else {
-                    operation.inputValue += e.target.textContent;
-                }
+    // INPUT WITH DIGITS
+    if(e.target.className === 'digit' && e.target.id !== 'decimal'){
+        // verify if the current input hasn't an equal sign
+        if(operation.inputValue.endsWith('=')){
+            // user has pressed a number after pressing '='
+            // start a new operation
+            operation.inputValue = '';
+            operation.inputValue += e.target.textContent;
+        }
+        // if not, continue getting the user's input
+        else {
+            operation.inputValue += e.target.textContent;
+        }
 
-            // INPUT WITH 4 OPERATORS
-            } else if(e.target.className === 'operator'){
-                // get unsanitized input first
-                operation.inputValue += e.target.textContent;
+    // INPUT WITH 4 OPERATORS
+    } else if(e.target.className === 'operator'){
+        // get unsanitized input first
+        operation.inputValue += e.target.textContent;
 
-                // only register the final operator clicked by the user
-                // remove any redundant operator
-                if(/\-?\d+\.?\d*[\+\-\*\/\=]{2,}/g.test(operation.inputValue)){
-                    operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=]+$/g, '') + e.target.textContent;
-                }
+        // only register the final operator clicked by the user
+        // remove any redundant operator
+        if(/\-?\d+\.?\d*[\+\-\*\/\=]{2,}/g.test(operation.inputValue)){
+            operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=]+$/g, '') + e.target.textContent;
+        }
 
-            // GET RESULT WITH EQUAL '=' SIGN
-            } else if(e.target.id === 'equal'){
-                // get unsanitized input first
-                operation.inputValue += e.target.textContent;
+    // GET RESULT WITH EQUAL '=' SIGN
+    } else if(e.target.id === 'equal'){
+        // get unsanitized input first
+        operation.inputValue += e.target.textContent;
 
-                // replace any previous operator by '=' sign
-                operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=\.]+$/, '=');
+        // replace any previous operator by '=' sign
+        operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=\.]+$/, '=');
 
-                // populate the 'operation' display with the current result
-                // if user click '=' again, or firstNumber if no previous result exist
-                document.getElementById('operation').innerText = operation.result || operation.firstNumber || '0';
-                document.getElementById('result').innerText = operation.result || operation.firstNumber || '0';
-            }
+        // populate the 'operation' display with the current result
+        // if user click '=' again, or firstNumber if no previous result exist
+        document.getElementById('operation').innerText = operation.result || operation.firstNumber || '0';
+        document.getElementById('result').innerText = operation.result || operation.firstNumber || '0';
+    }
 
-            // INPUT A DECIMAL NUMBER
-            else if(e.target.id === 'decimal'){
-                // get unsanitized input first
-                operation.inputValue += e.target.textContent;
+    // INPUT A DECIMAL NUMBER
+    else if(e.target.id === 'decimal'){
+        // get unsanitized input first
+        operation.inputValue += e.target.textContent;
 
-                // replace first redundant decimal point
-                operation.inputValue = operation.inputValue.replace(/\.{2,}/, '.');
-                
-                // if user click a decimal point again, delete it from input
-                if(/\d+\.{1}\d+\.+/.test(operation.inputValue)){
-                    operation.inputValue = operation.inputValue.replace(/[\.]+$/, '');
-                }
+        // replace first redundant decimal point
+        operation.inputValue = operation.inputValue.replace(/\.{2,}/, '.');
+        
+        // if user click a decimal point again, delete it from input
+        if(/\d+\.{1}\d+\.+/.test(operation.inputValue)){
+            operation.inputValue = operation.inputValue.replace(/[\.]+$/, '');
+        }
 
-                // if user click a decimal after clicking '=', delete decimal point
-                if(/.*\=\./.test(operation.inputValue)){
-                    operation.inputValue = operation.inputValue.replace(/[.]+$/, '');
-                }
-                
-            // NEGATE A NUMBER WITH '+/-'
-            } else if(e.target.id === 'negative'){
-                // first operand can be negated without a problem
-                // but second operand need to be extracted and negated
-                // to do that, use a temporary string to extract it
+        // if user click a decimal after clicking '=', delete decimal point
+        if(/.*\=\./.test(operation.inputValue)){
+            operation.inputValue = operation.inputValue.replace(/[.]+$/, '');
+        }
+        
+    // NEGATE A NUMBER WITH '+/-'
+    } else if(e.target.id === 'negative'){
+        // first operand can be negated without a problem
+        // but second operand need to be extracted and negated
+        // to do that, use a temporary string to extract it
 
-                // extract second operand without operators
-                let tempInput = operation.inputValue.replace(/^\-?\d+\.?\d*[\+\-\*\/]/, '');
+        // extract second operand without operators
+        let tempInput = operation.inputValue.replace(/^\-?\d+\.?\d*[\+\-\*\/]/, '');
 
-                // check if number is already negative
-                // if it is, remove first character '-'
-                if(tempInput.startsWith('-')){
-                    tempInput = tempInput.substring(1, operation.inputValue.length);
+        // check if number is already negative
+        // if it is, remove first character '-'
+        if(tempInput.startsWith('-')){
+            tempInput = tempInput.substring(1, operation.inputValue.length);
 
-                // if not, add negative sign
-                } else {
-                    tempInput = '-' + tempInput;
-                }
+        // if not, add negative sign
+        } else {
+            tempInput = '-' + tempInput;
+        }
 
-                // if user click more than once at '+/-' button
-                // delete extra '-'
-                tempInput = tempInput.replace(/^\-{2,}/, '-');
+        // if user click more than once at '+/-' button
+        // delete extra '-'
+        tempInput = tempInput.replace(/^\-{2,}/, '-');
 
-                // remove last '=' or result won't negate
-                // ex: in case we have an input like this: 36=
-                // instead of the regular 12*36=
-                if(tempInput.endsWith('=')){
-                    tempInput = tempInput.replace(/\=/, '');
-                }
+        // remove last '=' or result won't negate
+        // ex: in case we have an input like this: 36=
+        // instead of the regular 12*36=
+        if(tempInput.endsWith('=')){
+            tempInput = tempInput.replace(/\=/, '');
+        }
 
-                // get the previous input with new negated value
-                operation.inputValue = operation.inputValue.replace(/\-?\d+\.?\d*\=?$/, tempInput);
-            
-            // DELETE A DIGIT WITH BACKSPACE
-            } else if(e.target.id === 'delete'){
-                // (length - 1) to not include 0 or user need to click twice to delete last digit
-                if(operation.inputValue.length - 1){
-                    operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
-                } else {
-                    operation.inputValue = '0';
-                }
+        // get the previous input with new negated value
+        operation.inputValue = operation.inputValue.replace(/\-?\d+\.?\d*\=?$/, tempInput);
+    
+    // DELETE A DIGIT WITH BACKSPACE
+    } else if(e.target.id === 'delete'){
+        // (length - 1) to not include 0 or user need to click twice to delete last digit
+        if(operation.inputValue.length - 1){
+            operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
+        } else {
+            operation.inputValue = '0';
+        }
 
-            // RESET CALCULATOR
-            } else if(e.target.id === 'clear'){
-                clearDisplay(operation);
-            }
+    // RESET CALCULATOR
+    } else if(e.target.id === 'clear'){
+        clearDisplay(operation);
+    }
 
-            // using inputValue property directly won't work
-            // had to pass it as a string argument instead
-            displayOperation(operation.inputValue, operation);
-        });
-    });
+    // using inputValue property directly won't work
+    // had to pass it as a string argument instead
+    displayOperation(operation.inputValue, operation);
 }
 
 // Use regular expressions to get the operands and operators 
@@ -310,6 +298,28 @@ function clearDisplay(operation){
 
     // reset the input string
     operation.inputValue = '';
+}
+
+// setup listener for mouse and keyboard
+function calculator(){
+    let operation = {
+        inputValue: '',
+        firstNumber: null,
+        secondNumber: null,
+        firstOperation: null,
+        secondOperation: null,
+        result: null,
+    };
+
+    // mouse events
+    document.querySelectorAll('button').forEach(button =>{
+        button.addEventListener('click', (e) => { getUserInput(e, operation)});
+    });
+
+    // keyboard events
+    document.querySelectorAll('button').forEach(button =>{
+        button.addEventListener('keypress', (e) => { getUserInput(e, operation)});
+    });
 }
 
 calculator();
