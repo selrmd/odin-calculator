@@ -60,15 +60,10 @@ function operate(operator, a, b){
     }
 }
 
-
+// Handle every exception the user can do
+// outside of using the calculator normally
+// like clicking an operator multiple times
 function calculator(){
-    // get and display user input
-    setOperands();
-
-    
-}
-
-function setOperands(){
     let operation = {
         inputValue: '',
         firstNumber: null,
@@ -83,22 +78,22 @@ function setOperands(){
         button.addEventListener('click', e => {
 
             // when the input is a digit
-            if(e.target.className === 'digit'){
+            if(e.target.className === 'digit' && e.target.id !== 'decimal'){
                 // verify if the current input hasn't an equal sign
-                // if not, continue getting the user's input
-                console.log(`current input: ${operation.inputValue}`);
-
                 if(operation.inputValue.endsWith('=')){
                     // user has pressed a number after pressing '='
                     // start a new operation
                     operation.inputValue = '';
                     operation.inputValue += e.target.textContent;
-                } else {
+                } 
+                // if not, continue getting the user's input
+                else {
                     operation.inputValue += e.target.textContent;
                 }
 
             // when the input as an operator
             } else if(e.target.className === 'operator'){
+                // get unsanitized input first
                 operation.inputValue += e.target.textContent;
     
                 // only register the final operator clicked by the user
@@ -109,20 +104,53 @@ function setOperands(){
 
             // when the user click the '=' sign
             } else if(e.target.id === 'equal'){
-
+                // get unsanitized input first
                 operation.inputValue += e.target.textContent;
 
                 // replace any previous operator by '=' sign
-                operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=]+$/, '=');
-                console.log(`equal: ${operation.inputValue}`)
+                operation.inputValue = operation.inputValue.replace(/[\+\-\*\/\=\.]+$/, '=');
+            }
+            // when the user click a decimal point
+            else if(e.target.id === 'decimal'){
+                // get unsanitized input first
+                operation.inputValue += e.target.textContent;
+
+                // replace first redundant decimal point
+                operation.inputValue = operation.inputValue.replace(/\.{2,}/, '.');
+                
+                // if user click a decimal point again, delete it from input
+                if(/\d+\.{1}\d+\.+/.test(operation.inputValue)){
+                    operation.inputValue = operation.inputValue.replace(/[\.]+$/, '');
+                }
+
+                // if user click a decimal after clicking '=', delete decimal point
+                if(/.*\=\./.test(operation.inputValue)){
+                    operation.inputValue = operation.inputValue.replace(/[.]+$/, '');
+                }
+                
+            // if user delete some digits
+            } else if(e.target.className === 'delete'){
+                // (length - 1) to not include 0 or user need to click twice to delete last digit
+                if(operation.inputValue.length - 1){
+                    operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
+                } else {
+                    operation.inputValue = '0';
+                }
+
+            // if user wants to reset the whole calculator
+            } else if(e.target.className === 'clear'){
+                clearDisplay(operation);
             }
             
-            displayOperation(operation.inputValue, operation);
+            // using inputValue property directly won't work
+            // had to pass it as a string argument instead
+            displayOperation(operation.inputValue, operation, e);
         });
     });
 }
 
-function displayOperation(inputValue, operation){
+// Use regular expressions to get the operands and operators 
+function displayOperation(inputValue, operation, e){
 
     // match first number pattern
     // only digits
@@ -159,7 +187,7 @@ function displayOperation(inputValue, operation){
         // display the second number at the bottom portion of display
         document.getElementById('result').innerText = operation.secondNumber;
 
-    } 
+    }
     // match the exact full pattern of an operation, ex: 50-20= or 12-2*
     else if(inputValue.match(/^\d+\.?\d*[\+\-\*\/]{1}\d+\.?\d*[\+\-\*\/\=]{1}$/)){
 
@@ -169,11 +197,12 @@ function displayOperation(inputValue, operation){
         // calculate and display the result
         displayResult(operation);
     }
+
+    console.log(`current input: ${inputValue}`);
 }
 
-// display the result
-// this has two possibilities
-// either user clicked '=' or other 4 operators
+// handle the calculation and display the result
+// this has two possibilities: either user clicked '=' or other 4 operators
 function displayResult(operation){
 
     // calculate the result
@@ -213,13 +242,19 @@ function displayResult(operation){
     }
 }
 
-function clearDisplay(){
+// delete and reset everything
+function clearDisplay(operation){
+    // clear display
     document.getElementById('operation').innerText = '';
     document.getElementById('result').innerText = '0';
 
-    for(key in operation){
-        key = null;
+    // reset all keys in operation
+    for(const key in operation){
+        operation[key] = null;
     }
+
+    // reset the input string
+    operation.inputValue = '';
 }
 
 calculator();
