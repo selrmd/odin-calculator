@@ -9,9 +9,18 @@ body{
     align-items: center;
 }
 
+#upper-screen{
+    height: 80px;
+
+    background-color: white;
+}
+
 #calculator-container {
-    width: 500px;
-    height: 700px;
+    width: 400px;
+    height: 640px;
+    padding: 10px;
+
+    border-radius: 5px;
 
     display: flex;
     flex-direction: column;
@@ -20,23 +29,34 @@ body{
 }
 
 #screen-container {
-    height: 200px;
+    height: 160px;
 
-    background-color: white;
+    background-color: green;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+
+    padding: 20px;
 }
 
 #buttons-container {
-    height: 500px;
+    height: 400px;
 
     display: flex;
     flex-direction: column;
 }
 
 #extra-container {
-    width: 500px;
-    height: 100px;
+    width: 400px;
+    height: 80px;
 
     display: flex;
+
+    box-sizing: border-box;
 }
 
 #main-container {
@@ -45,35 +65,43 @@ body{
 
 #digits-container {
     width: 380px;
-    height: 400px;
 
     display: flex;
     flex-wrap: wrap-reverse;
+
+    box-sizing: border-box;
 }
 
 #operation-container {
-    width: 120px;
+    width: 100px;
     height: 100px;
+
+    box-sizing: border-box;
 }
 
 .digit,
 #negative {
-    width: 120px;
-    height: 100px;
+    width: 100px;
+    height: 80px;
 
     flex-grow: 1;
 }
 
 .operator {
-    width: 120px;
-    height: 100px;
+    width: 100px;
+    height: 80px;
 }
 
 #extra-container button{
-    width:127px;
-    height: 100px;
+    width:100px;
+    height: 80px;
 }
 
 #equal {
-    flex-grow: 2;
+    flex-grow: 1;
+}
+
+#operation,
+#result {
+    margin: 20px;
 }
