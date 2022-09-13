@@ -11,48 +11,63 @@
     <title>Calculator</title>
 </head>
 <body>
-    <div id="calculator-container">
-        <div id="screen-container">
-            <div id="operation"></div>
-            <div id="result">0</div>
+    <div id="left-container">
+        <div id="instructions">
+            <p id="header">Keyboard Shortcuts:</p>
+            <ul>
+                <li>Digits & Operators:&nbsp;<span class="shortcut">Numpad</span></li>
+                <li>= :&nbsp;<span class="shortcut">Enter</span></li>
+                <li><span class="material-symbols-outlined">backspace</span>:&nbsp;<span class="shortcut">Backspace</span></li>
+                <li><span class="material-symbols-outlined">delete</span>:&nbsp;<span class="shortcut">Del</span></li>
+                <li>Negate:&nbsp;<span class="shortcut">Insert</span></li>
+            </ul>
         </div>
+    </div>
 
-        <div id="buttons-container">
+    <div id="right-container">
+        <div id="calculator-container">
+            <div id="screen-container">
+                <div id="operation"></div>
+                <div id="result">0</div>
+            </div>
 
-            <div i="main-container">
+            <div id="buttons-container">
 
-                <div id="extra-container">
-                    <button id="clear" class="material-symbols-outlined">delete</button>
-                    <button id="delete" class="material-symbols-outlined">backspace</button>
-                    <button id="negative">+/-</button>
+                <div i="main-container">
+
+                    <div id="extra-container">
+                        <button id="clear" class="material-symbols-outlined">delete</button>
+                        <button id="delete" class="material-symbols-outlined">backspace</button>
+                        <button id="negative">+/-</button>
+                    </div>
+
+                    <div id="digits-container">
+                        <!-- numbers button-->
+                        <button class="digit" id="zero">0</button>
+                        <button class="digit" id="decimal">.</button>
+                        <button class="digit">1</button>
+                        <button class="digit">2</button>
+                        <button class="digit">3</button>
+                        <button class="digit">4</button>
+                        <button class="digit">5</button>
+                        <button class="digit">6</button>
+                        <button class="digit">7</button>
+                        <button class="digit">8</button>
+                        <button class="digit">9</button>
+                    </div>
+
                 </div>
 
-                <div id="digits-container">
-                    <!-- numbers button-->
-                    <button class="digit" id="zero">0</button>
-                    <button class="digit" id="decimal">.</button>
-                    <button class="digit">1</button>
-                    <button class="digit">2</button>
-                    <button class="digit">3</button>
-                    <button class="digit">4</button>
-                    <button class="digit">5</button>
-                    <button class="digit">6</button>
-                    <button class="digit">7</button>
-                    <button class="digit">8</button>
-                    <button class="digit">9</button>
+                <div id="operation-container">
+                    <!-- +, -, *, ... -->
+                    <button class="operator">+</button>
+                    <button class="operator">-</button>
+                    <button class="operator">*</button>
+                    <button class="operator">/</button>
+                    <button id="equal">=</button>
                 </div>
 
             </div>
-
-            <div id="operation-container">
-                <!-- +, -, *, ... -->
-                <button class="operator">+</button>
-                <button class="operator">-</button>
-                <button class="operator">*</button>
-                <button class="operator">/</button>
-                <button id="equal">=</button>
-            </div>
-
         </div>
     </div>
     

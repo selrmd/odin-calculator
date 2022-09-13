@@ -67,6 +67,7 @@ function getUserInput(e, operation){
 
     // INPUT WITH DIGITS
     if((e.target.className === 'digit' || e.code === `Numpad${e.key}`) && e.target.id !== 'decimal'){
+        
         // verify if the current input hasn't an equal sign
         if(operation.inputValue.endsWith('=')){
             // user has pressed a number after pressing '='
@@ -301,6 +302,8 @@ function displayOperation(inputValue, operation){
         displayResult(operation);
     }
 
+    console.log(`current input: ${operation.inputValue}`);
+
 }
 
 // handle the calculation and display the result
@@ -312,7 +315,7 @@ function displayResult(operation){
 
     // if result is a large number, convert it to scientific notation
     if(operation.result.toString().length > 15){
-        operation.result.toExponential(2);
+        operation.result = parseFloat(operation.result.toExponential(2));
     }
 
     if(operation.secondOperation === '='){
