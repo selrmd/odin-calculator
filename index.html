@@ -13,23 +13,23 @@
 <body>
     <div id="calculator-container">
         <div id="screen-container">
-            <div id="operation">15+666</div>
-            <div id="result">444444</div>
+            <div id="operation"></div>
+            <div id="result">0</div>
         </div>
 
         <div id="buttons-container">
-            <div id="extra-container">
-                <button id="clear" class="material-symbols-outlined">delete</button>
-                <button id="delete" class="material-symbols-outlined">backspace</button>
-                <button id="equal">=</button>
-            </div>
 
-            <div id="main-container">
+            <div i="main-container">
+
+                <div id="extra-container">
+                    <button id="clear" class="material-symbols-outlined">delete</button>
+                    <button id="delete" class="material-symbols-outlined">backspace</button>
+                    <button id="negative">+/-</button>
+                </div>
 
                 <div id="digits-container">
                     <!-- numbers button-->
-                    <button id="negative">+/-</button>
-                    <button class="digit">0</button>
+                    <button class="digit" id="zero">0</button>
                     <button class="digit" id="decimal">.</button>
                     <button class="digit">1</button>
                     <button class="digit">2</button>
@@ -41,15 +41,16 @@
                     <button class="digit">8</button>
                     <button class="digit">9</button>
                 </div>
-    
-                <div id="operation-container">
-                    <!-- +, -, *, ... -->
-                    <button class="operator">+</button>
-                    <button class="operator">-</button>
-                    <button class="operator">*</button>
-                    <button class="operator">/</button>
-                </div>
 
+            </div>
+
+            <div id="operation-container">
+                <!-- +, -, *, ... -->
+                <button class="operator">+</button>
+                <button class="operator">-</button>
+                <button class="operator">*</button>
+                <button class="operator">/</button>
+                <button id="equal">=</button>
             </div>
 
         </div>

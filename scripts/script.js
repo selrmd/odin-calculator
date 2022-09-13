@@ -71,7 +71,7 @@ function getUserInput(e, operation){
         if(operation.inputValue.endsWith('=')){
             // user has pressed a number after pressing '='
             // start a new operation
-            operation.inputValue = '';
+            operation.inputValue = '0';
 
             if(e.type === 'keydown'){
                 // keyboard support
@@ -128,6 +128,7 @@ function getUserInput(e, operation){
 
     // INPUT A DECIMAL NUMBER
     else if(e.target.id === 'decimal' || e.key === '.'){
+        
         // get unsanitized input first
         if(e.type === 'keydown'){
             // keyboard support
@@ -136,8 +137,16 @@ function getUserInput(e, operation){
             operation.inputValue += e.target.textContent;
         }
 
+        // if user clicked an operator before adding a decimal point
+        if(/\d+[\+\-\*\/]\./.test(operation.inputValue)){
+            console.log('there is a plus!!')
+            operation.inputValue = operation.inputValue.replace(/[\+\-\*\/]/, '');
+        }
+
         // replace first redundant decimal point
         operation.inputValue = operation.inputValue.replace(/\.{2,}/, '.');
+        console.log(`first after replace: ${operation.inputValue}`);
+
         
         // if user click a decimal point again, delete it from input
         if(/\d+\.{1}\d+\.+/.test(operation.inputValue)){
@@ -209,7 +218,7 @@ function displayOperation(inputValue, operation){
     if(/^\-?\d+\.?\d*$/.test(inputValue)){
 
         // parseFloat will remove any leading zeros
-        if(inputValue.length > 15){
+        if(inputValue.length > 10){
             // if user enter a very large number, convert it to scientific notation
             operation.firstNumber = parseFloat(inputValue).toExponential(2);
         } else {
@@ -224,6 +233,8 @@ function displayOperation(inputValue, operation){
             document.getElementById('result').innerText = operation.firstNumber;
         }
 
+        
+
     }
     // match first operation pattern
     // digits followed by a symbol
@@ -234,6 +245,8 @@ function displayOperation(inputValue, operation){
 
         // display the operation in the upper portion of display
         document.getElementById('operation').innerText = `${operation.firstNumber} ${operation.firstOperation}`;
+
+        
     }
     // match second number pattern
     // a symbol followed by a number only (no symbols)
@@ -249,7 +262,7 @@ function displayOperation(inputValue, operation){
         }
         
         // parseFloat removes any leading zeros
-        if(inputValue.length > 15){
+        if(inputValue.length > 10){
             // if user enter a very large number, convert it to scientific notation
             operation.secondNumber = parseFloat(inputValue).toExponential(2);
         } else {
@@ -331,22 +344,28 @@ function clearDisplay(operation){
 
     // reset all keys in operation
     for(const key in operation){
-        operation[key] = null;
+        if(key === 'firstOperation'){
+            operation[key] = '+';
+        } else if(key === 'secondOperation'){
+            operation[key] = '=';
+        } else {
+            operation[key] = 0;
+        }
     }
 
     // reset the input string
-    operation.inputValue = '';
+    operation.inputValue = '0';
 }
 
 // setup listener for mouse and keyboard
 function calculator(){
     let operation = {
-        inputValue: '',
-        firstNumber: null,
-        secondNumber: null,
-        firstOperation: null,
-        secondOperation: null,
-        result: null,
+        inputValue: '0',
+        firstNumber: 0,
+        secondNumber: 0,
+        firstOperation: '+',
+        secondOperation: '=',
+        result: 0,
     };
 
     // mouse events
