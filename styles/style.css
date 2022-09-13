@@ -1,5 +1,5 @@
 body{
-    background-color:beige;
+    background-color: #33658A;
     height: 100vh;
     margin: 0;
     padding: 0;
@@ -9,31 +9,27 @@ body{
     align-items: center;
 }
 
-#upper-screen{
-    height: 80px;
-
-    background-color: white;
-}
-
 #calculator-container {
     width: 400px;
-    height: 640px;
-    padding: 10px;
+    height: 565px;
+    padding: 15px;
 
     border-radius: 5px;
 
     display: flex;
     flex-direction: column;
 
-    background-color: red;
+    background-color: #003049;
 }
 
 #screen-container {
     height: 160px;
 
-    background-color: green;
+    /*background-color: #EAE2B7;*/
+    background-color: #fff8f0;
 
     box-sizing: border-box;
+    margin: -1px 1px;
 
     display: flex;
     flex-direction: column;
@@ -81,20 +77,36 @@ body{
 
 .digit,
 #negative {
-    width: 100px;
+    width: 92px;
     height: 80px;
 
     flex-grow: 1;
+
+    background-color: #86BBD8;
+}
+
+#negative,
+#decimal,
+#equal {
+    background-color: #F77F00;
+    color: #EAE2B7;
 }
 
 .operator {
-    width: 100px;
+    width: 92px;
     height: 80px;
+
+    background-color: #FCBF49;
+    color: #33658A;
 }
 
-#extra-container button{
+#clear,
+#delete {
     width:100px;
-    height: 80px;
+    height: 78px;
+
+    background-color: #D62828;
+    color: #EAE2B7;
 }
 
 #equal {
@@ -104,4 +116,10 @@ body{
 #operation,
 #result {
     margin: 20px;
+    color: #003049;
+}
+
+button {
+    border-style: none;
+    margin: 1px;
 }
