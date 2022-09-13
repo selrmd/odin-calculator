@@ -1,5 +1,4 @@
 body{
-    background-color: #33658A;
     height: 100vh;
     margin: 0;
     padding: 0;
@@ -9,13 +8,14 @@ body{
     align-items: center;
 
     font-family: 'Rubik';
+    background-color: #33658A;
 }
 
 #calculator-container {
     width: 376px;
-    border-radius: 5px;
-
+    border-radius: 8px;
     padding: 15px;
+
     display: flex;
     flex-direction: column;
 
@@ -24,46 +24,50 @@ body{
 
 #screen-container {
     height: 140px;
-    background-color: #fff8f0;
-
     box-sizing: border-box;
-
     margin: 1px 1px;
+    padding: 20px;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-end;
 
-    padding: 20px;
+    background-color: #fff8f0;
 }
 
+#operation,
+#result {
+    height: 32px;
+
+    font-size: 24px;
+    color: #003049;
+}
+
+#result {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+/* buttons container */
 #buttons-container {
     display: flex;
-}
-
-#extra-container {
-    display: flex;
-    box-sizing: border-box;
 }
 
 #main-container {
     display: flex;
 }
 
+#extra-container {
+    display: flex;
+}
+
 #digits-container {
     display: flex;
     flex-wrap: wrap-reverse;
-
-    box-sizing: border-box;
 }
 
-#operation-container {
-    width: 100px;
-
-    box-sizing: border-box;
-}
-
+/* digits */
 .digit {
     width: 92px;
     height: 80px;
@@ -71,24 +75,19 @@ body{
     background-color: #86BBD8;
 }
 
+#zero {
+    width: 186px;
+}
+
+/* operators */
 #negative,
 #decimal,
 #equal {
+    width: 92px;
+    height: 80px;
+
     background-color: #F77F00;
     color: #fff8f0;
-}
-
-#negative {
-    width: 92px;
-    height: 80px;
-}
-
-.operator {
-    width: 92px;
-    height: 80px;
-
-    background-color: #FCBF49;
-    color: #003049;
 }
 
 #clear,
@@ -100,24 +99,13 @@ body{
     color: #fff8f0;
 }
 
-#equal {
-    /*width: 186px;*/
+/* 4 operators */
+.operator {
     width: 92px;
     height: 80px;
-}
 
-#zero {
-    width: 186px;
-}
-
-#operation,
-#result {
-    height: 32px;
+    background-color: #FCBF49;
     color: #003049;
-
-    overflow: clip;
-
-    font-size: 24px;
 }
 
 button {

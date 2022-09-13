@@ -128,7 +128,7 @@ function getUserInput(e, operation){
 
     // INPUT A DECIMAL NUMBER
     else if(e.target.id === 'decimal' || e.key === '.'){
-        
+
         // get unsanitized input first
         if(e.type === 'keydown'){
             // keyboard support
@@ -159,44 +159,57 @@ function getUserInput(e, operation){
         }
         
     // NEGATE A NUMBER WITH '+/-'
-    } else if(e.target.id === 'negative' || e.code === 'Insert'){
-        // first operand can be negated without a problem
-        // but second operand need to be extracted and negated
-        // to do that, use a temporary string to extract it
+    } else if((e.target.id === 'negative' || e.code === 'Insert')){
 
-        // extract second operand without operators
-        let tempInput = operation.inputValue.replace(/^\-?\d+\.?\d*[\+\-\*\/]/, '');
+        // don't negate '0'
+        if(operation.inputValue !== '0'){
 
-        // check if number is already negative
-        // if it is, remove first character '-'
-        if(tempInput.startsWith('-')){
-            tempInput = tempInput.substring(1, operation.inputValue.length);
+            // first operand can be negated without a problem
+            // but second operand need to be extracted and negated
+            // to do that, use a temporary string to extract it
 
-        // if not, add negative sign
-        } else {
-            tempInput = '-' + tempInput;
+            // extract second operand without operators
+            let tempInput = operation.inputValue.replace(/^\-?\d+\.?\d*[\+\-\*\/]/, '');
+
+            // check if number is already negative
+            // if it is, remove first character '-'
+            if(tempInput.startsWith('-')){
+                tempInput = tempInput.substring(1, operation.inputValue.length);
+
+            // if not, add negative sign
+            } else {
+                tempInput = '-' + tempInput;
+            }
+
+            // if user click more than once at '+/-' button
+            // delete extra '-'
+            tempInput = tempInput.replace(/^\-{2,}/, '-');
+
+            // remove last '=' or result won't negate
+            // ex: in case we have an input like this: 36=
+            // instead of the regular 12*36=
+            if(tempInput.endsWith('=')){
+                tempInput = tempInput.replace(/\=/, '');
+            }
+
+            // get the previous input with new negated value
+            operation.inputValue = operation.inputValue.replace(/\-?\d+\.?\d*\=?$/, tempInput);
         }
-
-        // if user click more than once at '+/-' button
-        // delete extra '-'
-        tempInput = tempInput.replace(/^\-{2,}/, '-');
-
-        // remove last '=' or result won't negate
-        // ex: in case we have an input like this: 36=
-        // instead of the regular 12*36=
-        if(tempInput.endsWith('=')){
-            tempInput = tempInput.replace(/\=/, '');
-        }
-
-        // get the previous input with new negated value
-        operation.inputValue = operation.inputValue.replace(/\-?\d+\.?\d*\=?$/, tempInput);
     
     // DELETE A DIGIT WITH BACKSPACE
     } else if(e.target.id === 'delete' || e.code === 'Backspace'){
+        console.log(`current input: ${operation.inputValue}`);
+        
+        // if the input is the full operation, reset it to 0
+        if(operation.inputValue.endsWith('=')){
+            operation.inputValue = '0';
+        }
         // (length - 1) to not include 0 or user need to click twice to delete last digit
-        if(operation.inputValue.length - 1){
+        else if(operation.inputValue.length - 1){
             operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
-        } else {
+        }
+        // no more digits to delete 
+        else {
             operation.inputValue = '0';
         }
 
