@@ -7,15 +7,15 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
+
+    font-family: 'Rubik';
 }
 
 #calculator-container {
-    width: 400px;
-    height: 565px;
-    padding: 15px;
-
+    width: 376px;
     border-radius: 5px;
 
+    padding: 15px;
     display: flex;
     flex-direction: column;
 
@@ -23,35 +23,27 @@ body{
 }
 
 #screen-container {
-    height: 160px;
-
-    /*background-color: #EAE2B7;*/
+    height: 140px;
     background-color: #fff8f0;
 
     box-sizing: border-box;
-    margin: -1px 1px;
+
+    margin: 1px 1px;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-end;
 
     padding: 20px;
 }
 
 #buttons-container {
-    height: 400px;
-
     display: flex;
     flex-direction: column;
 }
 
 #extra-container {
-    width: 400px;
-    height: 80px;
-
     display: flex;
-
     box-sizing: border-box;
 }
 
@@ -60,8 +52,6 @@ body{
 }
 
 #digits-container {
-    width: 380px;
-
     display: flex;
     flex-wrap: wrap-reverse;
 
@@ -80,7 +70,6 @@ body{
     width: 92px;
     height: 80px;
 
-    flex-grow: 1;
 
     background-color: #86BBD8;
 }
@@ -89,7 +78,7 @@ body{
 #decimal,
 #equal {
     background-color: #F77F00;
-    color: #EAE2B7;
+    color: #fff8f0;
 }
 
 .operator {
@@ -97,29 +86,49 @@ body{
     height: 80px;
 
     background-color: #FCBF49;
-    color: #33658A;
+    color: #003049;
 }
 
 #clear,
 #delete {
-    width:100px;
+    width: 92px;
     height: 78px;
 
     background-color: #D62828;
-    color: #EAE2B7;
+    color: #fff8f0;
 }
 
 #equal {
-    flex-grow: 1;
+    width: 186px;
 }
 
 #operation,
 #result {
-    margin: 20px;
+    max-width: 334px;
     color: #003049;
+
+    border: 1px solid red;
+
+    align-self: flex-start;
+
+    overflow: clip;
+
+    font-size: 26px;
 }
 
 button {
     border-style: none;
     margin: 1px;
+
+    font-family: 'Rubik';
+    font-size: 28px;
+}
+
+/* google-icons font */
+.material-symbols-outlined {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 48
 }

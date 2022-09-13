@@ -209,12 +209,16 @@ function displayOperation(inputValue, operation){
     if(/^\-?\d+\.?\d*$/.test(inputValue)){
 
         // parseFloat will remove any leading zeros
-        operation.firstNumber = parseFloat(inputValue);
-
+        if(inputValue.length > 15){
+            // if user enter a very large number, convert it to scientific notation
+            operation.firstNumber = parseFloat(inputValue).toExponential(2);
+        } else {
+            operation.firstNumber = parseFloat(inputValue);
+        }
+        
         // display the decimal point parseFloat() removes when it's a whole number
         if(inputValue.endsWith('.')){
-            // didn't user operation.firstNumber to keep it a float instead of string
-            document.getElementById('result').innerText = parseFloat(inputValue) + '.';
+            document.getElementById('result').innerText = operation.firstNumber + '.';
         } else {
             // display whole number
             document.getElementById('result').innerText = operation.firstNumber;
@@ -245,12 +249,16 @@ function displayOperation(inputValue, operation){
         }
         
         // parseFloat removes any leading zeros
-        operation.secondNumber = parseFloat(inputValue);
+        if(inputValue.length > 15){
+            // if user enter a very large number, convert it to scientific notation
+            operation.secondNumber = parseFloat(inputValue).toExponential(2);
+        } else {
+            operation.secondNumber = parseFloat(inputValue);
+        }
 
         // display the decimal point parseFloat() removes when it's a whole number
         if(inputValue.endsWith('.')){
-            // didn't user operation.secondNumber to keep it a float instead of string
-            document.getElementById('result').innerText = parseFloat(inputValue) + '.';
+            document.getElementById('result').innerText = operation.secondNumber + '.';
         } else {
             // display the second number at the bottom portion of display
             document.getElementById('result').innerText = operation.secondNumber;
@@ -275,6 +283,11 @@ function displayResult(operation){
 
     // calculate the result
     operation.result = operate(operation.firstOperation, operation.firstNumber, operation.secondNumber);
+
+    // if result is a large number, convert it to scientific notation
+    if(operation.result.toString().length > 15){
+        operation.result.toExponential(2);
+    }
 
     if(operation.secondOperation === '='){
         // display full pattern in upper display, ex: 12+25=
