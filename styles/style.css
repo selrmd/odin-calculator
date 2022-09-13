@@ -15,6 +15,8 @@ body{
 
     display: flex;
     flex-direction: column;
+
+    background-color: red;
 }
 
 #screen-container {
@@ -27,49 +29,51 @@ body{
     height: 500px;
 
     display: flex;
-    flex: 1;
+    flex-direction: column;
+}
+
+#extra-container {
+    width: 500px;
+    height: 100px;
+
+    display: flex;
 }
 
 #main-container {
+    display: flex;
+}
+
+#digits-container {
     width: 380px;
+    height: 400px;
 
     display: flex;
     flex-wrap: wrap-reverse;
 }
 
-#extra-container {
-    width: 380px;
-
-    display: flex;
-    flex: 1;
-}
-
 #operation-container {
-    width: 100px;
-
-    display:flex;
-    flex-direction: column;
+    width: 120px;
+    height: 100px;
 }
 
 .digit,
 #negative {
-    width: 100px;
-    height: 100px;
-
-    flex-grow: 1;
-}
-
-#clear,
-#delete {
-    height: 100px;
-
-    flex: 1;
-}
-
-.operator,
-#equal {
     width: 120px;
     height: 100px;
 
     flex-grow: 1;
+}
+
+.operator {
+    width: 120px;
+    height: 100px;
+}
+
+#extra-container button{
+    width:127px;
+    height: 100px;
+}
+
+#equal {
+    flex-grow: 2;
 }
