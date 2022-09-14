@@ -172,7 +172,11 @@ function negateNumber(operation){
 
         // if not, add negative sign
         } else {
-            tempInput = '-' + tempInput;
+            // if operator is subtract '-', add another '-' for negation
+            if(operation.inputValue.search(/\-/) !== -1)
+                tempInput = '--' + tempInput;
+            else
+                tempInput = '-' + tempInput;
         }
 
         // remove last '=' or result won't negate
