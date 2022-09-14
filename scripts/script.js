@@ -44,7 +44,7 @@ function divide(a, b){
 }
 
 // DECIDE WHICH OPERATION FUNCTION
-// BASED ON OPERATOR
+// TO USE BASED ON OPERATOR
 function operate(operator, a, b){
     switch(operator){
         case '+':
@@ -175,13 +175,8 @@ function negateNumber(operation){
             tempInput = '-' + tempInput;
         }
 
-        // if user click more than once at '+/-' button
-        // delete extra '-'
-        tempInput = tempInput.replace(/^\-{2,}/, '-');
-
         // remove last '=' or result won't negate
-        // ex: in case we have an input like this: 36=
-        // instead of the regular 12*36=
+        // ex: in case we have an input like this: 36= instead of 12*36=
         if(tempInput.endsWith('=')){
             tempInput = tempInput.replace(/\=/, '');
         }
@@ -191,8 +186,10 @@ function negateNumber(operation){
     }
 }
 
+// REMOVE A SINGLE DIGIT AT A TIME
 function deleteDigit(operation){
 
+    // look for the index of the operator
     let index = operation.inputValue.search(/\W/);
 
     if(index  === operation.inputValue.length - 1){
@@ -301,14 +298,12 @@ function displayOperation(inputValue, operation){
         // this prevent the number from overflowing from its div
         operation.firstNumber = (operation.firstNumber.toString().length > 10) ? operation.firstNumber.toExponential(2) : operation.firstNumber;
 
-        // reduce the size of first operand if it's larger than 10 digits
         document.getElementById('operation').innerText = `${operation.firstNumber} ${operation.firstOperator}`;
     }
     // match second number pattern: a symbol followed by a number only (no symbols)
     else if(/[\+\-\*\/]*[^\+\-\*\/=]$/.test(inputValue)){
 
-        // remove the first number and first
-        // operation from received input
+        // remove the first number and first operator from received input
         if((/^\-?\d+\.?\d*[\+\-\*\/][\-]/).test(inputValue)){
             inputValue = inputValue.replace(/^\-?\d+\.?\d*[\+\-\*\/]+/, '');
             inputValue = '-' + inputValue;
@@ -343,7 +338,6 @@ function displayOperation(inputValue, operation){
         displayResult(operation);
     }
     
-    console.log(`current input: ${operation.inputValue}`);
 }
 
 // CALCULATE AND DISPLAY FINAL RESULT
@@ -359,10 +353,10 @@ function displayResult(operation){
     // convert second operand if it has more than 10 digits
     operation.secondNumber = (operation.secondNumber.toString().length > 10) ? operation.secondNumber.toExponential(2) : operation.secondNumber;
 
+    // user clicked '=' to get the final result
     if(operation.secondOperator === '=' && Number(operation.result)){
         // display full pattern in upper display, ex: 12+25=
-        document.getElementById('operation').innerText = 
-        `${operation.firstNumber} ${operation.firstOperator} ${operation.secondNumber} ${operation.secondOperator}`;
+        document.getElementById('operation').innerText = `${operation.firstNumber} ${operation.firstOperator} ${operation.secondNumber} ${operation.secondOperator}`;
         
         // display the result in bottom display, ex: 37
         document.getElementById('result').innerText = operation.result;
@@ -375,7 +369,9 @@ function displayResult(operation){
         // add '=' to reinitialize inputValue in 1st if of setOperands()
         operation.inputValue = operation.result + '=';
 
-    } else if(operation.secondOperator !== '=' && Number(operation.result)){
+    } 
+    // user clicked one of the 4 operators to chain operations
+    else if(operation.secondOperator !== '=' && Number(operation.result)){
         // display the result of the operation plus the second operator
         // convert result to a 10 digits number to prevent it from overflowing
         document.getElementById('operation').innerText = 
