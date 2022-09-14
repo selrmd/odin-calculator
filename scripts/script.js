@@ -375,7 +375,7 @@ function displayResult(operation){
         // add '=' to reinitialize inputValue in 1st if of setOperands()
         operation.inputValue = operation.result + '=';
 
-    } else if(operation.secondOperator === '=' && Number(operation.result)){
+    } else if(operation.secondOperator !== '=' && Number(operation.result)){
         // display the result of the operation plus the second operator
         // convert result to a 10 digits number to prevent it from overflowing
         document.getElementById('operation').innerText = 
