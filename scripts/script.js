@@ -189,9 +189,26 @@ function negateNumber(operation){
 // REMOVE A SINGLE DIGIT AT A TIME
 function deleteDigit(operation){
 
-    // look for the index of the operator
-    let index = operation.inputValue.search(/\W/);
+    // if result is negative, it won't delete
+    let index = -1, tempInput = '';
 
+    // if result is negative, it won't delete the whole number properly 
+    // because replace is detecting the negative sign
+
+    // replace the negative sign with '0'
+    if(operation.inputValue.startsWith('-')){
+        tempInput = operation.inputValue.replace(/^\-/, '0');
+    }
+
+    // if we don't have a negative sign, we get index directly from
+    // operation.inputValue
+    if(tempInput.length === 0)
+        index = operation.inputValue.search(/[\+\-\*\/\=]/);
+    // else we get it from the tempInput, this way search() won't
+    // confuse the negative sign with subtract operator
+    else
+        index = tempInput.search(/[\+\-\*\/\=]/);
+        
     if(index  === operation.inputValue.length - 1){
         // don't do anything
         // this prevent the deletion of previous operand and operator
