@@ -32,7 +32,7 @@ body{
 }
 
 #instructions {
-    width: 350px;
+    min-width: 350px;
     background-color: #fff8f0;
 
     padding: 20px;

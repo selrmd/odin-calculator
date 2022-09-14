@@ -193,13 +193,31 @@ function negateNumber(operation){
 
 function deleteDigit(operation){
     // if the input is the full operation, reset it to 0
-    if(operation.inputValue.endsWith('=')){
+    if(/[\+\-\*\/\=]$/.test(operation.inputValue)){
         operation.inputValue = '0';
     }
+
     // (length - 1) to not include 0 or user need to click twice to delete last digit
     else if(operation.inputValue.length - 1){
-        operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
+
+        // only delete digits of current input
+        if(/^\d+$/.test(operation.inputValue)){
+            console.log(`regex: ${/\d+/.test(operation.inputValue)}`)
+            operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
+        }
+        
+        // replace the previous operand with the current one
+        else {
+            operation.inputValue = operation.inputValue.replace(/\d+\W/, '');
+            // with only one character, substring won't work
+            // bypass it by setting input to '0' directly
+            if(operation.inputValue.length === 1)
+                operation.inputValue = '0';
+            else
+                operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
+        }
     }
+
     // no more digits to delete 
     else {
         operation.inputValue = '0';
@@ -335,11 +353,12 @@ function displayOperation(inputValue, operation){
         // calculate and display the result
         displayResult(operation);
     }
-
+    
+    console.log(`current input: ${operation.inputValue}`);
 }
 
-// handle the calculation and display the result
-// this has two possibilities: either user clicked '=' or other 4 operators
+// CALCULATE AND DISPLAY FINAL RESULT
+// USER EITHER GET RESULT BY '=' OR CHAINING MULTIPLE OPERATORS
 function displayResult(operation){
 
     // calculate the result
@@ -350,7 +369,7 @@ function displayResult(operation){
         operation.result = operation.result.toExponential(2);
     }
 
-    if(operation.secondOperator === '='){
+    if(operation.secondOperator === '=' && Number(operation.result)){
         // display full pattern in upper display, ex: 12+25=
         document.getElementById('operation').innerText = `${operation.firstNumber} ${operation.firstOperator} ${operation.secondNumber} ${operation.secondOperator}`;
         
@@ -364,8 +383,8 @@ function displayResult(operation){
         // the 2nd else-if in displayOperation() to get 2nd operator
         // add '=' to reinitialize inputValue in 1st if of setOperands()
         operation.inputValue = operation.result + '=';
-        
-    } else {
+
+    } else if(operation.secondOperator === '=' && Number(operation.result)){
         // display the result of the operation plus the second operator
         document.getElementById('operation').innerText = `${operation.result} ${operation.secondOperator}`;
 
@@ -381,10 +400,24 @@ function displayResult(operation){
         // update inputValue pattern to jump directly to 2nd else-if
         // in displayOperation() to get 2nd number
         operation.inputValue = operation.firstNumber + operation.secondOperator;
+
+    } 
+    // handle any operation that leads to an 'ERROR'
+    else if( !Number(operation.result) ) {
+        // display the 'ERROR' message
+        document.getElementById('result').innerText = operation.result;
+
+        // reset the whole calculator
+        operation.result = 0;
+        operation.firstNumber = 0;
+        operation.secondNumber = 0;
+        operation.firstOperator = '+';
+        operation.setOperators = '=';
+        operation.inputValue = '0';
     }
 }
 
-// setup listener for mouse and keyboard
+// INSTANTIATE AN OPERATION OBJECT TO BYPASS VARIABLE SCOPE
 function calculator(){
     let operation = {
         inputValue: '0',
@@ -404,5 +437,5 @@ function calculator(){
     window.addEventListener('keydown', (e) => getUserInput(e, operation));
 }
 
-// launch calculator
+// LAUNCH CALCULATOR
 calculator();
