@@ -192,36 +192,22 @@ function negateNumber(operation){
 }
 
 function deleteDigit(operation){
-    // if the input is the full operation, reset it to 0
+
+    let index = operation.inputValue.search(/\W/);
+
+    if(index  === operation.inputValue.length - 1){
+        // don't do anything
+        // this prevent the deletion of previous operand and operator
+    } else {
+        operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
+    }
+
+    // when the input reaches an operator, reset it to get new input
     if(/[\+\-\*\/\=]$/.test(operation.inputValue)){
-        operation.inputValue = '0';
+        document.getElementById('result').innerText = '0';
+        operation.inputValue += '';
     }
 
-    // (length - 1) to not include 0 or user need to click twice to delete last digit
-    else if(operation.inputValue.length - 1){
-
-        // only delete digits of current input
-        if(/^\d+$/.test(operation.inputValue)){
-            console.log(`regex: ${/\d+/.test(operation.inputValue)}`)
-            operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
-        }
-        
-        // replace the previous operand with the current one
-        else {
-            operation.inputValue = operation.inputValue.replace(/\d+\W/, '');
-            // with only one character, substring won't work
-            // bypass it by setting input to '0' directly
-            if(operation.inputValue.length === 1)
-                operation.inputValue = '0';
-            else
-                operation.inputValue = operation.inputValue.substring(0, operation.inputValue.length - 1);
-        }
-    }
-
-    // no more digits to delete 
-    else {
-        operation.inputValue = '0';
-    }
 }
 
 // RESET OPERATION AND CLEAR DISPLAY
@@ -289,7 +275,7 @@ function displayOperation(inputValue, operation){
     if(/^\-?\d+\.?\d*$/.test(inputValue)){
 
         // parseFloat will remove any leading zeros
-        if(inputValue.length > 10){
+        if(inputValue.length > 15){
             // if user enter a very large number, convert it to scientific notation
             operation.firstNumber = parseFloat(inputValue).toExponential(2);
         } else {
@@ -311,9 +297,12 @@ function displayOperation(inputValue, operation){
         // store first operator
         operation.firstOperator = inputValue.charAt(inputValue.length - 1);
 
-        // display the operation in the upper portion of display
-        document.getElementById('operation').innerText = `${operation.firstNumber} ${operation.firstOperator}`;
+        // reduce first operand size if it's more than 10 digits long
+        // this prevent the number from overflowing from its div
+        operation.firstNumber = (operation.firstNumber.toString().length > 10) ? operation.firstNumber.toExponential(2) : operation.firstNumber;
 
+        // reduce the size of first operand if it's larger than 10 digits
+        document.getElementById('operation').innerText = `${operation.firstNumber} ${operation.firstOperator}`;
     }
     // match second number pattern: a symbol followed by a number only (no symbols)
     else if(/[\+\-\*\/]*[^\+\-\*\/=]$/.test(inputValue)){
@@ -328,7 +317,7 @@ function displayOperation(inputValue, operation){
         }
         
         // parseFloat removes any leading zeros
-        if(inputValue.length > 10){
+        if(inputValue.length > 15){
             // if user enter a very large number, convert it to scientific notation
             operation.secondNumber = parseFloat(inputValue).toExponential(2);
         } else {
@@ -365,13 +354,15 @@ function displayResult(operation){
     operation.result = operate(operation.firstOperator, operation.firstNumber, operation.secondNumber);
 
     // if result is a large number, convert it to scientific notation
-    if(operation.result.toString().length > 10){
-        operation.result = operation.result.toExponential(2);
-    }
+    operation.result = (operation.result.toString().length > 15) ? operation.result.toExponential(2) : operation.result;
+
+    // convert second operand if it has more than 10 digits
+    operation.secondNumber = (operation.secondNumber.toString().length > 10) ? operation.secondNumber.toExponential(2) : operation.secondNumber;
 
     if(operation.secondOperator === '=' && Number(operation.result)){
         // display full pattern in upper display, ex: 12+25=
-        document.getElementById('operation').innerText = `${operation.firstNumber} ${operation.firstOperator} ${operation.secondNumber} ${operation.secondOperator}`;
+        document.getElementById('operation').innerText = 
+        `${operation.firstNumber} ${operation.firstOperator} ${operation.secondNumber} ${operation.secondOperator}`;
         
         // display the result in bottom display, ex: 37
         document.getElementById('result').innerText = operation.result;
@@ -386,7 +377,9 @@ function displayResult(operation){
 
     } else if(operation.secondOperator === '=' && Number(operation.result)){
         // display the result of the operation plus the second operator
-        document.getElementById('operation').innerText = `${operation.result} ${operation.secondOperator}`;
+        // convert result to a 10 digits number to prevent it from overflowing
+        document.getElementById('operation').innerText = 
+            `${(operation.result.toString().length > 10) ? operation.result.toExponential(2):operation.result} ${operation.secondOperator}`;
 
         // display the result in bottom display, ex: 37
         document.getElementById('result').innerText = operation.result;
